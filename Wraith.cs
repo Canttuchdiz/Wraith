@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,8 +19,6 @@ namespace Wraith
 
     public class Behaviour : MonoBehaviour
     {
-        Imbue imbue;
-        ColliderGroup blades;
         Transform flipping;
         private Item item;
         private RagdollHand handLeft;
@@ -33,13 +30,10 @@ namespace Wraith
             item = GetComponent<Item>();
             item.OnDespawnEvent += Item_OnDespawnEvent;
             item.OnHandleReleaseEvent += Item_OnHandleReleaseEvent;
-            item.OnHeldActionEvent += Item_OnHeldAction;
             handLeft = Player.local.handLeft.ragdollHand;
             handRight = Player.local.handRight.ragdollHand;
             offset = 1;
             flipping = item.transform.GetChild(1);
-            blades = item.colliderGroups[0];
-            imbue = blades.imbue;
         }
 
         private void Item_OnHandleReleaseEvent(Handle handle, RagdollHand ragdollHand, bool throwing)
@@ -58,22 +52,6 @@ namespace Wraith
             }
         }
 
-        private void Item_OnHeldAction(RagdollHand ragdollHand, Handle handle, Interactable.Action action)
-        {
-            if (action == Interactable.Action.UseStart)
-            {
-                GameManager.local.StartCoroutine(Imbue(waitTime));
-            }
-        }
-
-        private IEnumerable<WaitForSeconds> Imbue(float waitTime)
-        {
-            GameManager.SetPlayerInvincibility(true);
-            imbue.Transfer(Catalog.GetData<SpellCastCharge>("Lightning"), blades.imbue.maxEnergy);
-            yield return new WaitForSeconds(waitTime);
-            GameManager.SetPlayerInvincibility(false);
-            imbue.energy = 0;
-        }
 
         private void ControlHand_OnButtonPressEventRight(PlayerControl.Hand.Button button, bool pressed)
         {
